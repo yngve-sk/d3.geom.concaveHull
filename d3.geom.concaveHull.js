@@ -1,8 +1,8 @@
 (function() {
-d3.geom.concaveHull = function() {
+d3.concaveHull = function() {
   var calculateDistance = stdevDistance,
   padding = 0,
-  delaunay;
+  voronoi;
 
 
 function distance(a, b) {
@@ -11,9 +11,9 @@ function distance(a, b) {
     return Math.sqrt((dx * dx) + (dy * dy));
 }
 
-function stdevDistance(delaunay) {
+function stdevDistance(voronoi) {
   var sides = [];
-  delaunay.forEach(function (d) {
+  voronoi.forEach(function (d) {
     sides.push(distance(d[0],d[1]));
     sides.push(distance(d[0],d[2]));
     sides.push(distance(d[1],d[2]));
@@ -27,11 +27,11 @@ function stdevDistance(delaunay) {
 
 function concaveHull(vertices) {
 
-  delaunay = d3.geom.delaunay(vertices);
+  voronoi = d3.voronoi().triangles(vertices);
 
-  var longEdge = calculateDistance(delaunay);
+  var longEdge = calculateDistance(voronoi);
 
-  mesh = delaunay.filter(function (d) {
+  mesh = voronoi.filter(function (d) {
     return distance(d[0],d[1]) < longEdge && distance(d[0],d[2]) < longEdge && distance(d[1],d[2]) < longEdge
   })
 
@@ -98,12 +98,12 @@ function pad(bounds, amount) {
         im1 = bound.length - 1;
       }
       var pm = bound[im1];
-      area += (p[0] - pm[0]) * (p[1] + pm[1]) / 2; 
+      area += (p[0] - pm[0]) * (p[1] + pm[1]) / 2;
     });
     var handedness = 1;
     if(area > 0) handedness = -1
     bound.forEach(function(p, i) {
-      // average the tangent between 
+      // average the tangent between
       var im1 = i - 1;
       if(i == 0) {
         im1 = bound.length - 2;
